@@ -3,29 +3,27 @@ require 'lou/version'
 module Lou
   def self.extended(base)
     base.class_eval do
-      @forward_transforms = []
-      @backward_transforms = []
+      @transforms = []
     end
   end
 
   def transform(mapping)
-    @forward_transforms << mapping.fwd
-    @backward_transforms << mapping.bwd
+    @transforms << mapping
     self
   end
 
   def apply(input)
     output = deep_clone(input)
-    @forward_transforms.each do |t|
-      output = t.call(output)
+    @transforms.each do |t|
+      output = t.apply(output)
     end
     output
   end
 
   def undo(output)
     input = deep_clone(output)
-    @backward_transforms.reverse_each do |t|
-      input = t.call(input)
+    @transforms.reverse_each do |t|
+      input = t.undo(input)
     end
     input
   end
@@ -53,12 +51,12 @@ module Lou
       self
     end
 
-    def fwd
-      @forward
+    def apply(input)
+      @forward.nil? ? input : @forward.call(input)
     end
 
-    def bwd
-      @backward
+    def undo(output)
+      @backward.nil? ? output : @backward.call(output)
     end
   end
 end
