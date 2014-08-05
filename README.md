@@ -41,6 +41,8 @@ original = HashTransformer.undo(result)
 # {:an_old_key=>"this is old"}
 ~~~
 
+The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~undo~ function.
+
 Credits
 -------
 
