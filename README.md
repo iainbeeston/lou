@@ -1,7 +1,7 @@
 Lou
 ===
 
-[![Build Status](http://img.shields.io/travis/iainbeeston/lou/master.svg)](https://travis-ci.org/iainbeeston/lou)
+[![Build Status](https://travis-ci.org/iainbeeston/lou.svg?branch=master)](https://travis-ci.org/iainbeeston/lou)
 [![Code Climate](https://codeclimate.com/github/iainbeeston/lou/badges/gpa.svg)](https://codeclimate.com/github/iainbeeston/lou)
 
 Lou lets you define a pipeline of reversible transformations, that you can apply to any ruby object. For example, you might want to define a pipeline of [ImageMagick](http://www.imagemagick.org) operations on an image, or a sequence of API calls.
