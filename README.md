@@ -14,8 +14,18 @@ require 'lou'
 class HashTransformer
   extend Lou
 
-  transform forward { |x| x.merge(a_new_key: 'this is new') }.backward { |x| x.delete(:a_new_key) && x }
-  transform forward { |x| x.flatten }.backward { |x| Hash[*x] }
+  transform forward do |x|
+    x.merge(a_new_key: 'this is new')
+  end.backward do |x|
+   x.delete(:a_new_key)
+   x
+  end
+
+  transform forward do |x|
+    x.flatten
+  end.backward do |x|
+    Hash[*x]
+  end
 end
 ~~~
 
