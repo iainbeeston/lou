@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Lou::VERSION
   spec.authors       = ["Iain Beeston"]
   spec.email         = ["iain.beeston@gmail.com"]
-  spec.summary       = %q{Transforms hashes using a declarative dsl}
+  spec.summary       = %q{Flexible and reversible transforms using a declarative dsl}
   spec.homepage      = ""
   spec.license       = "MIT"
 
