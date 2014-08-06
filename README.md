@@ -43,6 +43,8 @@ original = HashTransformer.undo(result)
 
 The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~undo~ function.
 
+Note that for each transform, the input is the result of the previous step.
+
 Credits
 -------
 
