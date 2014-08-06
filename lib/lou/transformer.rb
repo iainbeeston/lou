@@ -1,9 +1,5 @@
 module Lou
   class Transformer
-    def initialize(&block)
-      forward(&block)
-    end
-
     def forward(&block)
       @forward = block
       self

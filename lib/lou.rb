@@ -34,6 +34,6 @@ module Lou
   end
 
   def forward(&block)
-    Transformer.new(&block)
+    Transformer.new.forward(&block)
   end
 end
