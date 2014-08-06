@@ -26,7 +26,7 @@ describe Lou do
     let(:klass) do
       Class.new do
         extend Lou
-        transform up { |x| x.push 'world' }.down { |x| x.delete_if { |y| y == 'world' } }
+        transform.up { |x| x.push 'world' }.down { |x| x.delete_if { |y| y == 'world' } }
       end
     end
 
@@ -57,8 +57,8 @@ describe Lou do
     let(:klass) do
       Class.new do
         extend Lou
-        transform up { |x| x + ', or not to be' }.down { |x| x.gsub(/, or not to be$/, '') }
-        transform up { |x| x + ', that is the question.' }.down { |x| x.gsub(/, that is the question\.$/, '') }
+        transform.up { |x| x + ', or not to be' }.down { |x| x.gsub(/, or not to be$/, '') }
+        transform.up { |x| x + ', that is the question.' }.down { |x| x.gsub(/, that is the question\.$/, '') }
       end
     end
 

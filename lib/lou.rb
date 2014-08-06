@@ -8,9 +8,10 @@ module Lou
     end
   end
 
-  def transform(mapping)
-    @transforms << mapping
-    self
+  def transform
+    Transformer.new.tap do |t|
+      @transforms << t
+    end
   end
 
   def apply(input)
@@ -31,9 +32,5 @@ module Lou
 
   def deep_clone(obj)
     Marshal.load(Marshal.dump(obj))
-  end
-
-  def up(&block)
-    Transformer.new.up(&block)
   end
 end

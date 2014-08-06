@@ -17,14 +17,14 @@ require 'lou'
 class HashTransformer
   extend Lou
 
-  transform up do |x|
+  transform.up do |x|
     x.merge(a_new_key: 'this is new')
   end.down do |x|
    x.delete(:a_new_key)
    x
   end
 
-  transform up do |x|
+  transform.up do |x|
     x.flatten
   end.down do |x|
     Hash[*x]
