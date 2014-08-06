@@ -4,7 +4,7 @@ Lou
 [![Build Status](https://travis-ci.org/iainbeeston/lou.svg?branch=master)](https://travis-ci.org/iainbeeston/lou)
 [![Code Climate](https://codeclimate.com/github/iainbeeston/lou/badges/gpa.svg)](https://codeclimate.com/github/iainbeeston/lou)
 
-Lou lets you define a pipeline of reversible transformations, that you can apply to any ruby object. For example, you might want to define a pipeline of [ImageMagick](http://www.imagemagick.org) operations on an image, or a sequence of API calls.
+Lou lets you define a pipeline of reversible transformations, that you can apply to any ruby object. It assumes nothing about your business logic or the objects that you're using. For example, you might want to define a pipeline of [ImageMagick](http://www.imagemagick.org) operations on an image, or a sequence of API calls. You could even use Lou as a replacement for ActiveRecord migrations.
 
 Usage
 -----
