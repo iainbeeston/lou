@@ -1,21 +1,21 @@
 module Lou
   class Transformer
-    def forward(&block)
-      @forward = block
+    def up(&block)
+      @up = block
       self
     end
 
-    def backward(&block)
-      @backward = block
+    def down(&block)
+      @down = block
       self
     end
 
     def apply(input)
-      @forward.nil? ? input : @forward.call(input)
+      @up.nil? ? input : @up.call(input)
     end
 
-    def undo(output)
-      @backward.nil? ? output : @backward.call(output)
+    def reverse(output)
+      @down.nil? ? output : @down.call(output)
     end
   end
 end

@@ -21,10 +21,10 @@ module Lou
     output
   end
 
-  def undo(output)
+  def reverse(output)
     input = deep_clone(output)
     @transforms.reverse_each do |t|
-      input = t.undo(input)
+      input = t.reverse(input)
     end
     input
   end
@@ -33,7 +33,7 @@ module Lou
     Marshal.load(Marshal.dump(obj))
   end
 
-  def forward(&block)
-    Transformer.new.forward(&block)
+  def up(&block)
+    Transformer.new.up(&block)
   end
 end

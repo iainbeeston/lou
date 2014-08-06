@@ -15,9 +15,9 @@ describe Lou do
       end
     end
 
-    describe '#undo' do
+    describe '#reverse' do
       it 'returns the input' do
-        expect(klass.undo('this is the input')).to eq('this is the input')
+        expect(klass.reverse('this is the input')).to eq('this is the input')
       end
     end
   end
@@ -26,12 +26,12 @@ describe Lou do
     let(:klass) do
       Class.new do
         extend Lou
-        transform forward { |x| x.push 'world' }.backward { |x| x.delete_if { |y| y == 'world' } }
+        transform up { |x| x.push 'world' }.down { |x| x.delete_if { |y| y == 'world' } }
       end
     end
 
     describe '#apply' do
-      it 'applies the forward transform' do
+      it 'applies the up transform' do
         expect(klass.apply(%w(hello))).to eq(%w(hello world))
       end
 
@@ -41,14 +41,14 @@ describe Lou do
       end
     end
 
-    describe '#undo' do
-      it 'applies the backward transform' do
-        expect(klass.undo(%w(hello world))).to eq(%w(hello))
+    describe '#reverse' do
+      it 'applies the down transform' do
+        expect(klass.reverse(%w(hello world))).to eq(%w(hello))
       end
 
       it 'does not change the input object' do
         input = %w(hello world)
-        expect { klass.undo(input) }.to_not change { input }
+        expect { klass.reverse(input) }.to_not change { input }
       end
     end
   end
@@ -57,20 +57,20 @@ describe Lou do
     let(:klass) do
       Class.new do
         extend Lou
-        transform forward { |x| x + ', or not to be' }.backward { |x| x.gsub(/, or not to be$/, '') }
-        transform forward { |x| x + ', that is the question.' }.backward { |x| x.gsub(/, that is the question\.$/, '') }
+        transform up { |x| x + ', or not to be' }.down { |x| x.gsub(/, or not to be$/, '') }
+        transform up { |x| x + ', that is the question.' }.down { |x| x.gsub(/, that is the question\.$/, '') }
       end
     end
 
     describe '#apply' do
-      it 'applies all of the forward transforms in order' do
+      it 'applies all of the up transforms in order' do
         expect(klass.apply('To be')).to eq('To be, or not to be, that is the question.')
       end
     end
 
-    describe '#undo' do
-      it 'applies all of the backward transforms in reverse order' do
-        expect(klass.undo('To be, or not to be, that is the question.')).to eq('To be')
+    describe '#reverse' do
+      it 'applies all of the down transforms in reverse order' do
+        expect(klass.reverse('To be, or not to be, that is the question.')).to eq('To be')
       end
     end
   end

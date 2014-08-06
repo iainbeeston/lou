@@ -17,16 +17,16 @@ require 'lou'
 class HashTransformer
   extend Lou
 
-  transform forward do |x|
+  transform up do |x|
     x.merge(a_new_key: 'this is new')
-  end.backward do |x|
+  end.down do |x|
    x.delete(:a_new_key)
    x
   end
 
-  transform forward do |x|
+  transform up do |x|
     x.flatten
-  end.backward do |x|
+  end.down do |x|
     Hash[*x]
   end
 end
@@ -37,11 +37,11 @@ Then you can use it like this:
 ~~~ruby
 result = HashTransformer.apply(an_old_key: 'this is old')
 # [:an_old_key, "this is old", :a_new_key, "this is new"]
-original = HashTransformer.undo(result)
+original = HashTransformer.reverse(result)
 # {:an_old_key=>"this is old"}
 ~~~
 
-The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~undo~ function.
+The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~reverse~ function.
 
 Note that for each transform, the input is the result of the previous step.
 
