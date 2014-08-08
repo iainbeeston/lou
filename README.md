@@ -17,6 +17,9 @@ require 'lou'
 class HashTransformer
   extend Lou::Transformer
 
+  # optional
+  reverse_on RuntimeError
+
   step.up do |x|
     x.merge(a_new_key: 'this is new')
   end.down do |x|
@@ -41,7 +44,9 @@ original = HashTransformer.reverse(result)
 # {:an_old_key=>"this is old"}
 ~~~
 
-The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~reverse~ function. Note that for each step, the input is the result of the previous step.
+The steps are applied in the order that they're defined, when the ~apply~ method is called, with each step receiving the result of the previous one. The process can be reversed using the ~reverse~ method. Note that for each step, the input is the result of the previous step.
+
+If ~reverse_on~ is defined, then any completed steps will be reversed if the exception specified is raised.
 
 Transformers inherit the steps of their parent class, so it's possible to reuse steps by using inheritance.
 

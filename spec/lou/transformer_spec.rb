@@ -110,5 +110,93 @@ module Lou
         end
       end
     end
+
+    context 'when an error is raised' do
+      let(:klass) do
+        Class.new do
+          extend Lou::Transformer
+          step.up { |_| fail 'error on up' }.down { |_| fail 'error on down' }
+        end
+      end
+
+      describe '#apply' do
+        it 'raises the exception' do
+          expect { klass.apply('foo') }.to raise_error('error on up')
+        end
+      end
+
+      describe '#reverse' do
+        it 'raises the exception' do
+          expect { klass.reverse('bar') }.to raise_error('error on down')
+        end
+      end
+    end
+
+    context 'when #reverse_on has been set' do
+      let(:parent) do
+        Class.new do
+          extend Lou::Transformer
+
+          class SpecialError < StandardError; end
+
+          reverse_on SpecialError
+        end
+      end
+
+      let(:target) { instance_double('Target') }
+
+      context 'and an error is raised on the first step' do
+        let(:klass) do
+          Class.new(parent) do
+            step.up { |_| fail SpecialError }.down { |x| x.destroy(1); x  }
+            step.up { |x| x.create(2); x }.down { |_| fail SpecialError }
+          end
+        end
+
+        describe '#apply' do
+          it 'reverses no steps when the specified error is raised' do
+            expect(target).to_not receive(:create)
+            expect(target).to_not receive(:destroy)
+            klass.apply(target)
+          end
+        end
+
+        describe '#reverse' do
+          it 'applies no steps when the specified error is raised' do
+            expect(target).to_not receive(:destroy)
+            expect(target).to_not receive(:create)
+            klass.reverse(target)
+          end
+        end
+      end
+
+      context 'and an error is raised part-way through the transform' do
+        let(:klass) do
+          Class.new(parent) do
+            step.up { |x| x.create(1); x }.down { |x| x.destroy(1); x }
+            step.up { |_| fail SpecialError }.down { |_| fail SpecialError }
+            step.up { |x| x.create(3); x }.down { |x| x.destroy(3); x }
+          end
+        end
+
+        let(:target) { instance_double('Target') }
+
+        describe '#apply' do
+          it 'reverses all successfully applied steps when the specified error is raised' do
+            expect(target).to receive(:create).once.with(1).ordered
+            expect(target).to receive(:destroy).once.with(1).ordered
+            klass.apply(target)
+          end
+        end
+
+        describe '#reverse' do
+          it 'reapplies all successfully reversed steps when the specified error is raised' do
+            expect(target).to receive(:destroy).once.with(3).ordered
+            expect(target).to receive(:create).once.with(3).ordered
+            klass.reverse(target)
+          end
+        end
+      end
+    end
   end
 end

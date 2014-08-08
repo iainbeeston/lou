@@ -3,11 +3,20 @@ require 'lou/transformer/step'
 
 module Lou
   module Transformer
+    # never raise this...
+    class NeverError < StandardError; end
+
     def self.extended(base)
       base.class_eval do
         class_attribute(:steps)
         self.steps = []
+        class_attribute(:error_class)
+        self.error_class = Lou::Transformer::NeverError
       end
+    end
+
+    def reverse_on(error)
+      self.error_class = error
     end
 
     def step
@@ -16,16 +25,28 @@ module Lou
       end
     end
 
-    def apply(input)
-      steps.each do |t|
-        input = t.apply(input)
+    def apply(input, total_steps = steps.count)
+      applied_steps = 0
+      begin
+        steps.last(total_steps).each do |t|
+          input = t.apply(input)
+          applied_steps += 1
+        end
+      rescue error_class => e
+        total_steps == steps.count ? reverse(input, applied_steps) : raise(e)
       end
       input
     end
 
-    def reverse(output)
-      steps.reverse_each do |t|
-        output = t.reverse(output)
+    def reverse(output, total_steps = steps.count)
+      reversed_steps = 0
+      begin
+        steps.first(total_steps).reverse_each do |t|
+          output = t.reverse(output)
+          reversed_steps += 1
+        end
+      rescue error_class => e
+        total_steps == steps.count ? apply(output, reversed_steps) : raise(e)
       end
       output
     end
