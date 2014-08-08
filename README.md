@@ -15,16 +15,16 @@ You can define transformations in their own class like this:
 require 'lou'
 
 class HashTransformer
-  extend Lou
+  extend Lou::Transformer
 
-  transform.up do |x|
+  step.up do |x|
     x.merge(a_new_key: 'this is new')
   end.down do |x|
    x.delete(:a_new_key)
    x
   end
 
-  transform.up do |x|
+  step.up do |x|
     x.flatten
   end.down do |x|
     Hash[*x]
