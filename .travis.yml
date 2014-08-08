@@ -5,3 +5,9 @@ rvm:
   - 2.1
   - jruby-1.7
   - rbx-2
+gemfile:
+  - .gemfiles/activesupport3_0.gemfile
+  - .gemfiles/activesupport3_1.gemfile
+  - .gemfiles/activesupport3_2.gemfile
+  - .gemfiles/activesupport4_0.gemfile
+  - .gemfiles/activesupport4_1.gemfile
