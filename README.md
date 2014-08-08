@@ -44,13 +44,13 @@ original = HashTransformer.reverse(result)
 # {:an_old_key=>"this is old"}
 ~~~
 
-The steps are applied in the order that they're defined, when the ~apply~ method is called, with each step receiving the result of the previous one. The process can be reversed using the ~reverse~ method. Note that for each step, the input is the result of the previous step.
+The steps are applied in the order that they're defined, when the `apply` method is called, with each step receiving the result of the previous one. The process can be reversed using the `reverse` method. Note that for each step, the input is the result of the previous step.
 
-If ~reverse_on~ is defined, then any completed steps will be reversed if the exception specified is raised.
+If `reverse_on` is defined, then any completed steps will be reversed if the exception specified is raised.
 
 Transformers inherit the steps of their parent class, so it's possible to reuse steps by using inheritance.
 
 Credits
 -------
 
-Lou is heavily inspired by [Hash Mapper](http://github.com/ismasan) by [Ismael Celis](http://github.com/ismasan).
+Lou was originally inspired by [Hash Mapper](http://github.com/ismasan) by [Ismael Celis](http://github.com/ismasan) to be a way of transforming hashes, however, it evolved into a general purpose pipeline for arbitrary blocks of code.
