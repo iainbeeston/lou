@@ -41,9 +41,9 @@ original = HashTransformer.reverse(result)
 # {:an_old_key=>"this is old"}
 ~~~
 
-The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~reverse~ function.
+The transforms are applied in the order that they're defined using the ~apply~ function, with each transform receiving the result of the previous one. The process can be reversed using the ~reverse~ function. Note that for each step, the input is the result of the previous step.
 
-Note that for each transform, the input is the result of the previous step.
+Transformers inherit the steps of their parent class, so it's possible to reuse steps by using inheritance.
 
 Credits
 -------
