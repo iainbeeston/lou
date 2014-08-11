@@ -133,11 +133,13 @@ module Lou
     end
 
     context 'when #reverse_on has been set' do
+      let!(:error_class) do
+        class SpecialError < StandardError; end
+      end
+
       let(:parent) do
         Class.new do
           extend Lou::Transformer
-
-          class SpecialError < StandardError; end
 
           reverse_on SpecialError
         end
@@ -157,7 +159,7 @@ module Lou
           it 'reverses no steps when the specified error is raised' do
             expect(target).to_not receive(:create)
             expect(target).to_not receive(:destroy)
-            klass.apply(target)
+            expect { klass.apply(target) }.to raise_error(SpecialError)
           end
         end
 
@@ -165,7 +167,7 @@ module Lou
           it 'applies no steps when the specified error is raised' do
             expect(target).to_not receive(:destroy)
             expect(target).to_not receive(:create)
-            klass.reverse(target)
+            expect { klass.reverse(target) }.to raise_error(SpecialError)
           end
         end
       end
@@ -182,18 +184,18 @@ module Lou
         let(:target) { instance_double('Target') }
 
         describe '#apply' do
-          it 'reverses all successfully applied steps when the specified error is raised' do
+          it 'reverses all successfully applied steps before raising the error when the specified error is raised' do
             expect(target).to receive(:create).once.with(1).ordered
             expect(target).to receive(:destroy).once.with(1).ordered
-            klass.apply(target)
+            expect { klass.apply(target) }.to raise_error(SpecialError)
           end
         end
 
         describe '#reverse' do
-          it 'reapplies all successfully reversed steps when the specified error is raised' do
+          it 'reapplies all successfully reversed steps before raising the error when the specified error is raised' do
             expect(target).to receive(:destroy).once.with(3).ordered
             expect(target).to receive(:create).once.with(3).ordered
-            klass.reverse(target)
+            expect { klass.reverse(target) }.to raise_error(SpecialError)
           end
         end
       end

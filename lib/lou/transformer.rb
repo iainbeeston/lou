@@ -33,7 +33,8 @@ module Lou
           applied_steps += 1
         end
       rescue error_class => e
-        total_steps == steps.count ? reverse(input, applied_steps) : raise(e)
+        reverse(input, applied_steps) if total_steps == steps.count
+        raise e
       end
       input
     end
@@ -46,7 +47,8 @@ module Lou
           reversed_steps += 1
         end
       rescue error_class => e
-        total_steps == steps.count ? apply(output, reversed_steps) : raise(e)
+        apply(output, reversed_steps) if total_steps == steps.count
+        raise e
       end
       output
     end
