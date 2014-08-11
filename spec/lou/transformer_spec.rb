@@ -197,6 +197,29 @@ module Lou
           end
         end
       end
+
+      context 'and the up and down steps should lead to an infinite loop' do
+        let(:klass) do
+          Class.new(parent) do
+            step.up { |x| x.create(1); x }.down { |_| fail SpecialError, 'fail on down' }
+            step.up { |_| fail SpecialError, 'fail on up' }.down { |x| x.destroy(2); x }
+          end
+        end
+
+        describe '#apply' do
+          it 'raises the error from the down step' do
+            expect(target).to receive(:create).once.with(1)
+            expect { klass.apply(target) }.to raise_error(SpecialError, 'fail on down')
+          end
+        end
+
+        describe '#reverse' do
+          it 'raises the error from the up step' do
+            expect(target).to receive(:destroy).once.with(2)
+            expect { klass.reverse(target) }.to raise_error(SpecialError, 'fail on up')
+          end
+        end
+      end
     end
   end
 end
