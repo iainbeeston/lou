@@ -8,9 +8,9 @@ module Lou
 
     def self.extended(base)
       base.class_eval do
-        class_attribute(:steps)
+        class_attribute :steps
         self.steps = []
-        class_attribute(:error_class)
+        class_attribute :error_class
         self.error_class = Lou::Transformer::NeverError
       end
     end
@@ -21,7 +21,7 @@ module Lou
 
     def step
       Step.new.tap do |t|
-        steps << t
+        self.steps += [t]
       end
     end
 

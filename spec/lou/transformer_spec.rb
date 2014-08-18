@@ -4,7 +4,7 @@ require 'spec_helper'
 module Lou
   describe Transformer do
     context 'with no steps defined' do
-      let(:klass) do
+      let!(:klass) do
         Class.new do
           extend Lou::Transformer
         end
@@ -24,7 +24,7 @@ module Lou
     end
 
     context 'with one step' do
-      let(:klass) do
+      let!(:klass) do
         Class.new do
           extend Lou::Transformer
           step.up { |x| x.push 'world' }.down { |x| x.delete_if { |y| y == 'world' } }
@@ -45,7 +45,7 @@ module Lou
     end
 
     context 'with two steps' do
-      let(:klass) do
+      let!(:klass) do
         Class.new do
           extend Lou::Transformer
           step.up { |x| x + ', or not to be' }.down { |x| x.gsub(/, or not to be$/, '') }
@@ -67,18 +67,18 @@ module Lou
     end
 
     context 'when extended from another transformer' do
-      let(:parent) do
+      let!(:parent) do
         Class.new do
           extend Lou::Transformer
           step.up { |x| x.create; x }.down { |x| x.destroy; x }
         end
       end
-      let(:child) do
+      let!(:child) do
         Class.new(parent) do
           step.up { |x| x.create; x }.down { |x| x.destroy; x }
         end
       end
-      let(:grandchild) do
+      let!(:grandchild) do
         Class.new(child) do
           step.up { |x| x.create; x }.down { |x| x.destroy; x }
         end
@@ -112,7 +112,7 @@ module Lou
     end
 
     context 'when an error is raised' do
-      let(:klass) do
+      let!(:klass) do
         Class.new do
           extend Lou::Transformer
           step.up { |_| fail 'error on up' }.down { |_| fail 'error on down' }
@@ -137,7 +137,7 @@ module Lou
         class SpecialError < StandardError; end
       end
 
-      let(:parent) do
+      let!(:parent) do
         Class.new do
           extend Lou::Transformer
 
@@ -148,7 +148,7 @@ module Lou
       let(:target) { instance_double('Target') }
 
       context 'and an error is raised on the first step' do
-        let(:klass) do
+        let!(:klass) do
           Class.new(parent) do
             step.up { |_| fail SpecialError }.down { |x| x.destroy(1); x  }
             step.up { |x| x.create(2); x }.down { |_| fail SpecialError }
@@ -173,7 +173,7 @@ module Lou
       end
 
       context 'and an error is raised part-way through the transform' do
-        let(:klass) do
+        let!(:klass) do
           Class.new(parent) do
             step.up { |x| x.create(1); x }.down { |x| x.destroy(1); x }
             step.up { |_| fail SpecialError }.down { |_| fail SpecialError }
@@ -201,7 +201,7 @@ module Lou
       end
 
       context 'and the up and down steps should lead to an infinite loop' do
-        let(:klass) do
+        let!(:klass) do
           Class.new(parent) do
             step.up { |x| x.create(1); x }.down { |_| fail SpecialError, 'fail on down' }
             step.up { |_| fail SpecialError, 'fail on up' }.down { |x| x.destroy(2); x }
