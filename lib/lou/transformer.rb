@@ -1,4 +1,3 @@
-require 'active_support/core_ext/class/attribute'
 require 'lou/transformer/step'
 
 module Lou
@@ -6,11 +5,11 @@ module Lou
     # never raise this...
     class NeverError < StandardError; end
 
+    attr_accessor :steps, :error_class
+
     def self.extended(base)
       base.class_eval do
-        class_attribute :steps
         self.steps = []
-        class_attribute :error_class
         self.error_class = Lou::Transformer::NeverError
       end
     end
@@ -19,10 +18,18 @@ module Lou
       self.error_class = error
     end
 
-    def step
-      Step.new.tap do |t|
+    def step(transformer)
+      transformer.tap do |t|
         self.steps += [t]
       end
+    end
+
+    def up(&block)
+      Transformer::Step.new.up(&block)
+    end
+
+    def down(&block)
+      Transformer::Step.new.down(&block)
     end
 
     def apply(input, total_steps = steps.count)

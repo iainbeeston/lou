@@ -27,7 +27,7 @@ module Lou
       let!(:klass) do
         Class.new do
           extend Lou::Transformer
-          step.up { |x| x.push 'world' }.down { |x| x.delete_if { |y| y == 'world' } }
+          step up { |x| x.push 'world' }.down { |x| x.delete_if { |y| y == 'world' } }
         end
       end
 
@@ -48,8 +48,8 @@ module Lou
       let!(:klass) do
         Class.new do
           extend Lou::Transformer
-          step.up { |x| x + ', or not to be' }.down { |x| x.gsub(/, or not to be$/, '') }
-          step.up { |x| x + ', that is the question.' }.down { |x| x.gsub(/, that is the question\.$/, '') }
+          step up { |x| x + ', or not to be' }.down { |x| x.gsub(/, or not to be$/, '') }
+          step up { |x| x + ', that is the question.' }.down { |x| x.gsub(/, that is the question\.$/, '') }
         end
       end
 
@@ -66,21 +66,27 @@ module Lou
       end
     end
 
-    context 'when extended from another transformer' do
-      let!(:parent) do
+    context 'when one of the steps is another transformer' do
+      let!(:grandchild) do
+        parent = Class.new do
+          extend Lou::Transformer
+          step up { |x| x.create; x }.down { |x| x.destroy; x }
+        end
+
+        child = Class.new do
+          extend Lou::Transformer
+
+          step(parent)
+
+          step up { |x| x.create; x }.down { |x| x.destroy; x }
+        end
+
         Class.new do
           extend Lou::Transformer
-          step.up { |x| x.create; x }.down { |x| x.destroy; x }
-        end
-      end
-      let!(:child) do
-        Class.new(parent) do
-          step.up { |x| x.create; x }.down { |x| x.destroy; x }
-        end
-      end
-      let!(:grandchild) do
-        Class.new(child) do
-          step.up { |x| x.create; x }.down { |x| x.destroy; x }
+
+          step(child)
+
+          step up { |x| x.create; x }.down { |x| x.destroy; x }
         end
       end
 
@@ -91,22 +97,12 @@ module Lou
           expect(target).to receive(:create).exactly(3).times
           grandchild.apply(target)
         end
-
-        it 'does not alter the up steps of the parent' do
-          expect(target).to receive(:create).exactly(1).times
-          parent.apply(target)
-        end
       end
 
       describe '#reverse' do
         it 'reverses the steps of the child first, then the parent' do
           expect(target).to receive(:destroy).exactly(3).times
           grandchild.reverse(target)
-        end
-
-        it 'does not alter the down steps of the parent' do
-          expect(target).to receive(:destroy).exactly(1).times
-          parent.reverse(target)
         end
       end
     end
@@ -115,7 +111,7 @@ module Lou
       let!(:klass) do
         Class.new do
           extend Lou::Transformer
-          step.up { |_| fail 'error on up' }.down { |_| fail 'error on down' }
+          step up { |_| fail 'error on up' }.down { |_| fail 'error on down' }
         end
       end
 
@@ -137,21 +133,16 @@ module Lou
         class SpecialError < StandardError; end
       end
 
-      let!(:parent) do
-        Class.new do
-          extend Lou::Transformer
-
-          reverse_on SpecialError
-        end
-      end
-
       let(:target) { instance_double('Target') }
 
       context 'and an error is raised on the first step' do
         let!(:klass) do
-          Class.new(parent) do
-            step.up { |_| fail SpecialError }.down { |x| x.destroy(1); x  }
-            step.up { |x| x.create(2); x }.down { |_| fail SpecialError }
+          Class.new do
+            extend Lou::Transformer
+            reverse_on(SpecialError)
+
+            step up { |_| fail SpecialError }.down { |x| x.destroy(1); x  }
+            step up { |x| x.create(2); x }.down { |_| fail SpecialError }
           end
         end
 
@@ -174,14 +165,15 @@ module Lou
 
       context 'and an error is raised part-way through the transform' do
         let!(:klass) do
-          Class.new(parent) do
-            step.up { |x| x.create(1); x }.down { |x| x.destroy(1); x }
-            step.up { |_| fail SpecialError }.down { |_| fail SpecialError }
-            step.up { |x| x.create(3); x }.down { |x| x.destroy(3); x }
+          Class.new do
+            extend Lou::Transformer
+            reverse_on(SpecialError)
+
+            step up { |x| x.create(1); x }.down { |x| x.destroy(1); x }
+            step up { |_| fail SpecialError }.down { |_| fail SpecialError }
+            step up { |x| x.create(3); x }.down { |x| x.destroy(3); x }
           end
         end
-
-        let(:target) { instance_double('Target') }
 
         describe '#apply' do
           it 'reverses all successfully applied steps before raising the error when the specified error is raised' do
@@ -202,9 +194,12 @@ module Lou
 
       context 'and the up and down steps should lead to an infinite loop' do
         let!(:klass) do
-          Class.new(parent) do
-            step.up { |x| x.create(1); x }.down { |_| fail SpecialError, 'fail on down' }
-            step.up { |_| fail SpecialError, 'fail on up' }.down { |x| x.destroy(2); x }
+          Class.new do
+            extend Lou::Transformer
+            reverse_on(SpecialError)
+
+            step up { |x| x.create(1); x }.down { |_| fail SpecialError, 'fail on down' }
+            step up { |_| fail SpecialError, 'fail on up' }.down { |x| x.destroy(2); x }
           end
         end
 

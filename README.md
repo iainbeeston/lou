@@ -20,14 +20,14 @@ class HashTransformer
   # optional
   reverse_on RuntimeError
 
-  step.up do |x|
+  step up do |x|
     x.merge(a_new_key: 'this is new')
   end.down do |x|
    x.delete(:a_new_key)
    x
   end
 
-  step.up do |x|
+  step up do |x|
     x.flatten
   end.down do |x|
     Hash[*x]
@@ -48,7 +48,7 @@ The steps are applied in the order that they're defined, when the `apply` method
 
 If `reverse_on` is defined, then any completed steps will be reversed if the exception specified is raised.
 
-Transformers inherit the steps of their parent class, so it's possible to reuse steps by using inheritance.
+Transformers can reuse other transformers as steps. In fact, any object that defines an `apply` method and a `reverse` method can be used as a step.
 
 Credits
 -------
