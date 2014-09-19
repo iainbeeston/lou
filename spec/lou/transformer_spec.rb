@@ -16,9 +16,9 @@ module Lou
         end
       end
 
-      describe '#reverse' do
+      describe '#revert' do
         it 'returns the input' do
-          expect(klass.reverse('this is the input')).to eq('this is the input')
+          expect(klass.revert('this is the input')).to eq('this is the input')
         end
       end
     end
@@ -37,9 +37,9 @@ module Lou
         end
       end
 
-      describe '#reverse' do
+      describe '#revert' do
         it 'applies the down step' do
-          expect(klass.reverse(%w(hello world))).to eq(%w(hello))
+          expect(klass.revert(%w(hello world))).to eq(%w(hello))
         end
       end
     end
@@ -59,9 +59,9 @@ module Lou
         end
       end
 
-      describe '#reverse' do
-        it 'applies all of the down steps in reverse order' do
-          expect(klass.reverse('To be, or not to be, that is the question.')).to eq('To be')
+      describe '#revert' do
+        it 'applies all of the down steps in revert order' do
+          expect(klass.revert('To be, or not to be, that is the question.')).to eq('To be')
         end
       end
     end
@@ -99,10 +99,10 @@ module Lou
         end
       end
 
-      describe '#reverse' do
-        it 'reverses the steps of the child first, then the parent' do
+      describe '#revert' do
+        it 'reverts the steps of the child first, then the parent' do
           expect(target).to receive(:destroy).exactly(3).times
-          grandchild.reverse(target)
+          grandchild.revert(target)
         end
       end
     end
@@ -121,14 +121,14 @@ module Lou
         end
       end
 
-      describe '#reverse' do
+      describe '#revert' do
         it 'raises the exception' do
-          expect { klass.reverse('bar') }.to raise_error('error on down')
+          expect { klass.revert('bar') }.to raise_error('error on down')
         end
       end
     end
 
-    context 'when #reverse_on has been set' do
+    context 'when #revert_on has been set' do
       let!(:error_class) do
         class SpecialError < StandardError; end
       end
@@ -139,7 +139,7 @@ module Lou
         let!(:klass) do
           Class.new do
             extend Lou::Transformer
-            reverse_on(SpecialError)
+            revert_on(SpecialError)
 
             step up { |_| fail SpecialError }.down { |x| x.destroy(1); x  }
             step up { |x| x.create(2); x }.down { |_| fail SpecialError }
@@ -147,18 +147,18 @@ module Lou
         end
 
         describe '#apply' do
-          it 'reverses no steps when the specified error is raised' do
+          it 'reverts no steps when the specified error is raised' do
             expect(target).to_not receive(:create)
             expect(target).to_not receive(:destroy)
             expect { klass.apply(target) }.to raise_error(SpecialError)
           end
         end
 
-        describe '#reverse' do
+        describe '#revert' do
           it 'applies no steps when the specified error is raised' do
             expect(target).to_not receive(:destroy)
             expect(target).to_not receive(:create)
-            expect { klass.reverse(target) }.to raise_error(SpecialError)
+            expect { klass.revert(target) }.to raise_error(SpecialError)
           end
         end
       end
@@ -167,7 +167,7 @@ module Lou
         let!(:klass) do
           Class.new do
             extend Lou::Transformer
-            reverse_on(SpecialError)
+            revert_on(SpecialError)
 
             step up { |x| x.create(1); x }.down { |x| x.destroy(1); x }
             step up { |_| fail SpecialError }.down { |_| fail SpecialError }
@@ -176,18 +176,18 @@ module Lou
         end
 
         describe '#apply' do
-          it 'reverses all successfully applied steps before raising the error when the specified error is raised' do
+          it 'reverts all successfully applied steps before raising the error when the specified error is raised' do
             expect(target).to receive(:create).once.with(1).ordered
             expect(target).to receive(:destroy).once.with(1).ordered
             expect { klass.apply(target) }.to raise_error(SpecialError)
           end
         end
 
-        describe '#reverse' do
-          it 'reapplies all successfully reversed steps before raising the error when the specified error is raised' do
+        describe '#revert' do
+          it 'reapplies all successfully revertd steps before raising the error when the specified error is raised' do
             expect(target).to receive(:destroy).once.with(3).ordered
             expect(target).to receive(:create).once.with(3).ordered
-            expect { klass.reverse(target) }.to raise_error(SpecialError)
+            expect { klass.revert(target) }.to raise_error(SpecialError)
           end
         end
       end
@@ -196,7 +196,7 @@ module Lou
         let!(:klass) do
           Class.new do
             extend Lou::Transformer
-            reverse_on(SpecialError)
+            revert_on(SpecialError)
 
             step up { |x| x.create(1); x }.down { |_| fail SpecialError, 'fail on down' }
             step up { |_| fail SpecialError, 'fail on up' }.down { |x| x.destroy(2); x }
@@ -210,10 +210,10 @@ module Lou
           end
         end
 
-        describe '#reverse' do
+        describe '#revert' do
           it 'raises the error from the up step' do
             expect(target).to receive(:destroy).once.with(2)
-            expect { klass.reverse(target) }.to raise_error(SpecialError, 'fail on up')
+            expect { klass.revert(target) }.to raise_error(SpecialError, 'fail on up')
           end
         end
       end

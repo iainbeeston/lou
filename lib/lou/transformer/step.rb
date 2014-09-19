@@ -15,7 +15,7 @@ module Lou
         up_blk.nil? ? input : up_blk.call(input)
       end
 
-      def reverse(output)
+      def revert(output)
         down_blk.nil? ? output : down_blk.call(output)
       end
 

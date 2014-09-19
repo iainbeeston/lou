@@ -12,7 +12,7 @@ module Lou
       end
     end
 
-    def reverse_on(error)
+    def revert_on(error)
       self.transformer_error_class = error
     end
 
@@ -38,17 +38,17 @@ module Lou
           applied_steps += 1
         end
       rescue transformer_error_class => e
-        reverse(input, applied_steps) if total_steps == transformer_steps.count
+        revert(input, applied_steps) if total_steps == transformer_steps.count
         raise e
       end
       input
     end
 
-    def reverse(output, total_steps = transformer_steps.count)
+    def revert(output, total_steps = transformer_steps.count)
       reversed_steps = 0
       begin
         transformer_steps.first(total_steps).reverse_each do |t|
-          output = t.reverse(output)
+          output = t.revert(output)
           reversed_steps += 1
         end
       rescue transformer_error_class => e
