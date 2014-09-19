@@ -18,16 +18,16 @@ class HashTransformer
   extend Lou::Transformer
 
   # optional
-  reverse_on RuntimeError
+  revert_on RuntimeError
 
-  step.up do |x|
+  step up do |x|
     x.merge(a_new_key: 'this is new')
   end.down do |x|
    x.delete(:a_new_key)
    x
   end
 
-  step.up do |x|
+  step up do |x|
     x.flatten
   end.down do |x|
     Hash[*x]
@@ -40,15 +40,15 @@ Then you can use it like this:
 ~~~ruby
 result = HashTransformer.apply(an_old_key: 'this is old')
 # [:an_old_key, "this is old", :a_new_key, "this is new"]
-original = HashTransformer.reverse(result)
+original = HashTransformer.revert(result)
 # {:an_old_key=>"this is old"}
 ~~~
 
-The steps are applied in the order that they're defined, when the `apply` method is called, with each step receiving the result of the previous one. The process can be reversed using the `reverse` method. Note that for each step, the input is the result of the previous step.
+The steps are applied in the order that they're defined, when the `apply` method is called, with each step receiving the result of the previous one. The process can be reversed using the `revert` method. Note that for each step, the input is the result of the previous step.
 
-If `reverse_on` is defined, then any completed steps will be reversed if the exception specified is raised.
+If `revert_on` is defined, then any completed steps will be reversed if the exception specified is raised.
 
-Transformers inherit the steps of their parent class, so it's possible to reuse steps by using inheritance.
+Transformers can reuse other transformers as steps. In fact, any object that defines an `apply` method and a `revert` method can be used as a step.
 
 Credits
 -------
