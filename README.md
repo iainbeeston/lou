@@ -50,6 +50,31 @@ If `revert_on` is defined, then any completed steps will be reversed if the exce
 
 Transformers can reuse other transformers as steps. In fact, any object that defines an `apply` method and a `revert` method can be used as a step.
 
+~~~ruby
+class FakeTransformer
+  def self.apply(x)
+    x + ["this is special"]
+  end
+
+  def self.revert(x)
+    x.pop
+    x
+  end
+end
+
+class CompositeTransformer
+  extend Lou::Transformer
+
+  step HashTransformer
+  step FakeTransformer
+end
+
+result = CompositeTransformer.apply(an_old_key: 'this is old')
+# [:an_old_key, "this is old", :a_new_key, "this is new", "this is special"]
+original = CompositeTransformer.revert(result)
+# {:an_old_key=>"this is old"}
+~~~
+
 Credits
 -------
 
