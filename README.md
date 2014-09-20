@@ -20,18 +20,18 @@ class HashTransformer
   # optional
   revert_on RuntimeError
 
-  step up do |x|
+  step up { |x|
     x.merge(a_new_key: 'this is new')
-  end.down do |x|
+  }.down { |x|
    x.delete(:a_new_key)
    x
-  end
+  }
 
-  step up do |x|
+  step up { |x|
     x.flatten
-  end.down do |x|
+  }.down { |x|
     Hash[*x]
-  end
+  }
 end
 ~~~
 
