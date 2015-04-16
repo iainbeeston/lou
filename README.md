@@ -79,3 +79,8 @@ Credits
 -------
 
 Lou was originally inspired by [Hash Mapper](http://github.com/ismasan) by [Ismael Celis](http://github.com/ismasan) to be a way of transforming hashes, however, it evolved into a general purpose pipeline for arbitrary blocks of code.
+
+Related
+-------
+
+* [Transproc](https://github.com/solnic/transproc)
